@@ -109,10 +109,12 @@ func (t *Todos) Print() {
 	for idx, item := range *t {
 		idx++
 		task := blue(item.Task)
-		diff := ""
+		diff := "..."
+    completed := "..."
 
 		if item.Done {
 			task = green(fmt.Sprintf("✅ %s", item.Task))
+      completed = green("Yes")
 
 			diffOp := item.CreatedAt.Day() - item.CompletedAt.Day()
 
@@ -137,7 +139,7 @@ func (t *Todos) Print() {
 		cells = append(cells, []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: fmt.Sprintf("%d", idx)},
 			{Align: simpletable.AlignCenter, Text: task},
-			{Align: simpletable.AlignCenter, Text: fmt.Sprintf("%t", item.Done)},
+			{Align: simpletable.AlignCenter, Text: completed},
 			{Align: simpletable.AlignCenter, Text: item.CreatedAt.Format(time.RFC822)},
 			{Align: simpletable.AlignCenter, Text: completedAt},
 			{Align: simpletable.AlignCenter, Text: diff},
