@@ -17,10 +17,10 @@ const (
 )
 
 func main() {
-	add := flag.Bool("add", false, "Add a new task")
+	add := flag.String("add", "", "Add a new task")
 	complete := flag.Int("complete", 0, "Mark a task as completed")
 	del := flag.Int("del", 0, "Delete a task")
-	list := flag.Bool("list", true, "List all tasks")
+	list := flag.Bool("list", false, "List all tasks")
 
 	flag.Parse()
 
@@ -32,41 +32,25 @@ func main() {
 	}
 
 	switch {
-	case *add:
+	case *add != "":
 		task, err := getInput(os.Stdin, flag.Args()...)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-
+		checkError(err)
 		todos.Add(task)
 		err = todos.Store(todoFile)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+		checkError(err)
+
 	case *complete > 0:
 		err := todos.Complete(*complete)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+		checkError(err)
 		err = todos.Store(todoFile)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+		checkError(err)
+
 	case *del > 0:
 		err := todos.Delete(*del)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+		checkError(err)
 		err = todos.Store(todoFile)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
+		checkError(err)
+
 	case *list:
 		todos.Print()
 	default:
@@ -94,4 +78,11 @@ func getInput(r io.Reader, args ...string) (string, error) {
 	}
 
 	return text, nil
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
 }
